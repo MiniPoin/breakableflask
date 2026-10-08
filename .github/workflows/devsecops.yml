@@ -6,6 +6,15 @@ jobs:
     steps:
       - name: Dependances
         run: |
+          echo "Répertoire courant :" 
+          pwd 
+          
+          echo "Contenu du repository :"
+          ls -la 
+          
+          echo "Recherche de requirements.txt :" 
+          find . -name "requirements.txt" -type f
+          
           docker run --rm -v "$PWD":/project -v $HOME/.cache/trivy:/root/.cache/ aquasec/trivy:latest fs /project/requirements.txt  |
           echo "ecrire ici le scrypt de contrôle des dépendances"
   Dockerfile:
