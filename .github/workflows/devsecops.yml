@@ -1,29 +1,35 @@
 name: Automatisation des tests DevSecOps
 on: push
+
 jobs:
   Dependances:
     runs-on: ubuntu-latest
     steps:
+      - name: Récupération du code
+        uses: actions/checkout@v4
+
       - name: Dependances
         run: |
-          echo "Répertoire courant :" 
-          pwd 
-          
-          echo "Contenu du repository :"
-          ls -la 
-          
-          echo "Recherche de requirements.txt :" 
-          find . -name "requirements.txt" -type f
-          
-          docker run --rm -v "$PWD":/project -v $HOME/.cache/trivy:/root/.cache/ aquasec/trivy:latest fs /project/requirements.txt  |
-          echo "ecrire ici le scrypt de contrôle des dépendances"
+          docker run --rm -v "$PWD":/axela/src aquasec/trivy:latest fs \
+            --scanners vuln \
+            --severity HIGH,CRITICAL \
+            --exit-code 1 \
+            /axela/src
+
   Dockerfile:
     runs-on: ubuntu-latest
     needs: Dependances
     steps:
+      - name: Récupération du code
+        uses: actions/checkout@v4
+
       - name: Test Dockerfile
-        run: | 
-          echo "ecrire ici le scrypt de contrôle du Dockerfile"
+        run: |
+          docker run --rm -v "$PWD":/axela/src aquasec/trivy:latest config \
+            --severity HIGH,CRITICAL \
+            --exit-code 1 \
+            /axela/src
+
   Deploy:
     runs-on: ubuntu-latest
     needs: Dockerfile
